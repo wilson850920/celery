@@ -35,13 +35,11 @@ There are several parameters for celery. Ex. `celery -A tasks worker --loglevel=
 
 #### 	tasks.py:
 
-​		This program contains tow functions, which adds and multiplies the two input integers x and y. In order to simulate the complex tasks in real-world, the system will sleep for 5 seconds.
+​		This program contains tow functions, which adds and multiplies the two input integers x and y. In order to simulate the complex tasks in real-world, the system will sleep for 10 seconds.
 
 ##### 		Without Celery:
 
 ​			`$ source virtualenv/bin/activate`
-
-​			`$ cd practice`
 
 ​			`$ python`
 
@@ -57,7 +55,7 @@ There are several parameters for celery. Ex. `celery -A tasks worker --loglevel=
 
 ​				12
 
-​			You can see that when you call the functions, the system will pause for 5 seconds, which makes the whole program waiting, this is time-consuming.
+​			You can see that when you call the functions, the system will pause for 10 seconds, which makes the whole program waiting, this is time-consuming.
 
 ##### 		With Celery:
 
@@ -65,15 +63,11 @@ There are several parameters for celery. Ex. `celery -A tasks worker --loglevel=
 
 ​				`$ source virtualenv/bin/activate`
 
-​				`$ cd practice `
-
 ​				`$ celery -A tasks worker --loglevel=info `
 
 ###### 			Terminal 2 (python):
 
 ​				`$ source virtualenv/bin/activate`
-
-​				`$ cd practice`
 
 ​				`$ python`
 
@@ -103,8 +97,6 @@ There are several parameters for celery. Ex. `celery -A tasks worker --loglevel=
 
 ​			`$ source virtualenv/bin/activate`
 
-​			`$ cd practice`
-
 ​			`$ python celery_example.py` 
 
 ```python
@@ -113,17 +105,17 @@ import time
 
 app = Flask(__name__)
 
-@app.route('process/<name>')
+@app.route('/celery_example/<name>')
 def process(name):
     time.sleep(10)
     print(name[::-1])
-    return '<h1> I sent an async request!</h1>'
+    return '<h1> Request Received!</h1>'
 
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = '5000', debug = True)
 ```
 
-​		Open your brower and type your IP address (`192.xx.xx.xx:5000/process/testing`), the website will then return "I sent an async request!", whereas the terminal when have a 10 seconds delay before the result "gnitset".
+​		Open your brower and type your IP address (`192.xx.xx.xx:5000/process/testing`), the website will then return "Request Received!", whereas the terminal when have a 10 seconds delay before the result "gnitset".
 
 
 
@@ -140,10 +132,10 @@ app.config['CELERY_BACKEND'] = 'redis://127.0.0.1:6379/0'
 
 celery = make_celery(app)
 
-@app.route('/process/<name>')
+@app.route('/celery_example/<name>')
 def process(name):
     reverse.delay(name)
-    return '<h1>I sent an async request!</h1>'
+    return '<h1>Request Received!</h1>'
 
 @celery.task(name = 'celery_example.reverse')
 def reverse(string):
@@ -158,19 +150,15 @@ if __name__ == '__main__':
 
 ​				`$ source virtualenv/bin/activate`
 
-​				`$ cd practice `
-
 ​				`$ celery -A celery_example.celery worker --loglevel=info `
 
 ###### 		Terminal 2 (python):
 
 ​				`$ source virtualenv/bin/activate`
 
-​				`$ cd practice`
-
 ​				`$ python celery_example.py` 
 
-​			Open your browser and type in the address(`192.xx.xx.xx:5000/process/flask_celery`). Though the website will return "I sent an async request" immediately, the terminal for celery will wait 10 seconds before returning the result "yrelec_ksalf". You can try changing the URL and the website will still be able to function, whereas celery will output each result after 10 seconds.
+​			Open your browser and type in the address(`192.xx.xx.xx:5000/process/flask_celery`). Though the website will return "Request Received!" immediately, the terminal for celery will wait 10 seconds before returning the result "yrelec_ksalf". You can try changing the URL and the website will still be able to function, whereas celery will output each result after 10 seconds.
 
 ###### flask_celery.py:
 
